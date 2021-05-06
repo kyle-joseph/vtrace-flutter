@@ -20,6 +20,8 @@ class _SignupPageState extends State<SignupPage> {
   bool loading = false;
 
   String company = '';
+  String address = '';
+  String contactNumber = '';
   String email = '';
   String password = '';
   String confirmPassword = '';
@@ -68,14 +70,55 @@ class _SignupPageState extends State<SignupPage> {
                                         bottom: BorderSide(
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
-                                  validator: (val) =>
-                                      val.isEmpty ? 'Enter Company Name' : null,
+                                  validator: (val) => val.isEmpty
+                                      ? 'Please enter establishment name'
+                                      : null,
                                   onChanged: (val) {
                                     setState(() => company = val);
                                   },
                                   decoration: InputDecoration(
                                       border: InputBorder.none,
-                                      hintText: "Company Name",
+                                      hintText: "Establishment name",
+                                      hintStyle:
+                                          TextStyle(color: Colors.grey[400])),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: Colors.grey[100]))),
+                                child: TextFormField(
+                                  validator: (val) => val.isEmpty
+                                      ? 'Please enter address'
+                                      : null,
+                                  onChanged: (val) {
+                                    setState(() => address = val);
+                                  },
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Address",
+                                      hintStyle:
+                                          TextStyle(color: Colors.grey[400])),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: Colors.grey[100]))),
+                                child: TextFormField(
+                                  validator: (val) => val.isEmpty
+                                      ? 'Please enter contact no.'
+                                      : null,
+                                  onChanged: (val) {
+                                    setState(() => contactNumber = val);
+                                  },
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Contact number",
                                       hintStyle:
                                           TextStyle(color: Colors.grey[400])),
                                 ),
@@ -117,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
                                   validator: (val) => val.length < 8
-                                      ? 'Password should be at least 8 chars'
+                                      ? 'Password should be at least 8 characters'
                                       : null,
                                   onChanged: (val) {
                                     setState(() => password = val);

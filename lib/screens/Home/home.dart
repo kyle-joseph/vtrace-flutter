@@ -12,7 +12,7 @@ class Home extends StatelessWidget {
 
     // if (state.currentUser.email == "none" &&
     //     state.currentUser.company == "none") {
-    // return Auth();
+    return Auth();
     // }
 
     return WillPopScope(

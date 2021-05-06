@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'VTrace',
-      initialRoute: '/scan',
+      initialRoute: '/',
       routes: {
         '/': (context) => Home(),
         '/logs': (context) => Logs(),
