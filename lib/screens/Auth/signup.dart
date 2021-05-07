@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:vtraceflutter/components/loading.dart';
 import 'package:vtraceflutter/services/connection.dart';
 import 'package:vtraceflutter/services/authentication.dart';
@@ -71,7 +70,7 @@ class _SignupPageState extends State<SignupPage> {
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
                                   validator: (val) => val.isEmpty
-                                      ? 'Please enter establishment name'
+                                      ? 'Please enter establishment name.'
                                       : null,
                                   onChanged: (val) {
                                     setState(() => company = val);
@@ -91,7 +90,7 @@ class _SignupPageState extends State<SignupPage> {
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
                                   validator: (val) => val.isEmpty
-                                      ? 'Please enter address'
+                                      ? 'Please enter address.'
                                       : null,
                                   onChanged: (val) {
                                     setState(() => address = val);
@@ -111,7 +110,7 @@ class _SignupPageState extends State<SignupPage> {
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
                                   validator: (val) => val.isEmpty
-                                      ? 'Please enter contact no.'
+                                      ? 'Please enter contact number.'
                                       : null,
                                   onChanged: (val) {
                                     setState(() => contactNumber = val);
@@ -140,7 +139,7 @@ class _SignupPageState extends State<SignupPage> {
                                       }
                                       return 'Invalid email';
                                     }
-                                    return 'Please enter email';
+                                    return 'Please enter email.';
                                   },
                                   onChanged: (val) {
                                     setState(() => email = val);
@@ -160,7 +159,7 @@ class _SignupPageState extends State<SignupPage> {
                                             color: Colors.grey[100]))),
                                 child: TextFormField(
                                   validator: (val) => val.length < 8
-                                      ? 'Password should be at least 8 characters'
+                                      ? 'Password should be at least 8 characters.'
                                       : null,
                                   onChanged: (val) {
                                     setState(() => password = val);
@@ -182,7 +181,7 @@ class _SignupPageState extends State<SignupPage> {
                                 child: TextFormField(
                                   validator: (val) {
                                     if (val != password) {
-                                      return "Password doesn't match";
+                                      return "Password doesn't match.";
                                     }
                                     return null;
                                   },
@@ -224,50 +223,65 @@ class _SignupPageState extends State<SignupPage> {
                                   color: Color.fromRGBO(143, 100, 251, .8)),
                             ),
                             onPressed: () async {
-                              //   //Signup
+                              //Signup
 
-                              //   if (_signupFormKey.currentState.validate()) {
-                              //     bool connection =
-                              //         await Connection().checkConnection();
-                              //     if (connection) {
-                              //       setState(() => loading = true);
+                              if (_signupFormKey.currentState.validate()) {
+                                bool connection =
+                                    await Connection().checkConnection();
+                                if (connection) {
+                                  setState(() => loading = true);
+                                  SharedPreferences _login =
+                                      await SharedPreferences.getInstance();
 
-                              //       SharedPreferences _login =
-                              //           await SharedPreferences.getInstance();
+                                  var newEstablishment = await _auth.signup(
+                                      email: email,
+                                      password: password,
+                                      establishmentName: company,
+                                      address: address,
+                                      contactNumber: contactNumber);
 
-                              //       bool emailExist =
-                              //           await _auth.emailExists(email);
+                                  if (newEstablishment['success']) {
+                                    var establishmentLogin = await _auth.login(
+                                        establishmentId:
+                                            newEstablishment['newEstablishment']
+                                                ['establishmentId'],
+                                        password: password);
 
-                              //       if (!emailExist) {
-                              //         dynamic user = await _auth.registerUser(
-                              //             company, email, password);
+                                    if (establishmentLogin['success']) {
+                                      _login.setString(
+                                          'establishmentName',
+                                          establishmentLogin[
+                                              'establishmentName']);
+                                      _login.setString(
+                                          'establishmentId',
+                                          establishmentLogin[
+                                              'establishmentId']);
+                                      _login.setString('vtestToken',
+                                          establishmentLogin['vtestToken']);
 
-                              //         if (user != null) {
-                              //           Provider.of<AppState>(context,
-                              //                   listen: false)
-                              //               .setUser(user);
+                                      await Navigator.popAndPushNamed(
+                                          context, "/");
 
-                              //           _login.setString('email', user.email);
-                              //           _login.setString(
-                              //               'company', user.company);
-                              //           setState(() => error = '');
-                              //           setState(() => loading = false);
-                              //         } else {
-                              //           setState(() => error =
-                              //               'Failed to register. Please try again.');
-                              //           setState(() => loading = false);
-                              //         }
-                              //       } else {
-                              //         setState(
-                              //             () => error = 'Email already exist');
-                              //         setState(() => loading = false);
-                              //       }
-                              //     } else {
-                              //       Toast.show(
-                              //           "No Internet Connection", context,
-                              //           duration: 5, gravity: Toast.TOP);
-                              //     }
-                              //   }
+                                      setState(() => loading = false);
+                                    } else {
+                                      setState(() {
+                                        loading = false;
+                                        error =
+                                            "Failed to login. Please try again";
+                                      });
+                                    }
+                                  } else {
+                                    setState(() {
+                                      loading = false;
+                                      error =
+                                          "An error in creating your account.";
+                                    });
+                                  }
+                                } else {
+                                  Toast.show("No Internet Connection", context,
+                                      duration: 5, gravity: Toast.TOP);
+                                }
+                              }
                             },
                           ),
                         ),

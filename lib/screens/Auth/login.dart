@@ -1,7 +1,4 @@
-// import 'package:FastTrace/services/authenticate.dart';
-// import 'package:FastTrace/State/appstate.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:vtraceflutter/components/loading.dart';
 import 'package:vtraceflutter/services/connection.dart';
 import 'package:vtraceflutter/services/authentication.dart';
@@ -24,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   String error = '';
 
   //will hold the value of email and password
-  String email = '';
+  String establishmentId = '';
   String password = '';
 
   @override
@@ -72,24 +69,15 @@ class _LoginPageState extends State<LoginPage> {
                                             bottom: BorderSide(
                                                 color: Colors.grey[100]))),
                                     child: TextFormField(
-                                      validator: (val) {
-                                        if (val.isNotEmpty) {
-                                          bool emailValid = RegExp(
-                                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                              .hasMatch(val);
-                                          if (emailValid) {
-                                            return null;
-                                          }
-                                          return 'Invalid email';
-                                        }
-                                        return 'Please enter email';
-                                      },
+                                      validator: (val) => val.isEmpty
+                                          ? 'Please enter establishment id.'
+                                          : null,
                                       onChanged: (val) {
-                                        setState(() => email = val);
+                                        setState(() => establishmentId = val);
                                       },
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        hintText: "Email",
+                                        hintText: "Establishment Id",
                                         hintStyle:
                                             TextStyle(color: Colors.grey[400]),
                                       ),
@@ -100,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: TextFormField(
                                       obscureText: true,
                                       validator: (val) => val.length < 8
-                                          ? 'Password should be at least 8 chars'
+                                          ? 'Password should be at least 8 characters.'
                                           : null,
                                       onChanged: (val) {
                                         setState(() => password = val);
@@ -138,42 +126,46 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Color.fromRGBO(143, 148, 251, .8)),
                                 ),
                                 onPressed: () async {
-                                  //   if (_formKey.currentState.validate()) {
-                                  //     bool connection =
-                                  //         await Connection().checkConnection();
+                                  if (_formKey.currentState.validate()) {
+                                    bool connection =
+                                        await Connection().checkConnection();
+                                    if (connection) {
+                                      setState(() => loading = true);
+                                      SharedPreferences _login =
+                                          await SharedPreferences.getInstance();
 
-                                  //     if (connection) {
-                                  //       setState(() => loading = true);
-                                  //       SharedPreferences _login =
-                                  //           await SharedPreferences.getInstance();
+                                      var establishmentLogin =
+                                          await _auth.login(
+                                              establishmentId: establishmentId,
+                                              password: password);
 
-                                  //       dynamic user = await _auth.loginUser(
-                                  //           email, password);
+                                      if (establishmentLogin['success']) {
+                                        _login.setString(
+                                            'establishmentName',
+                                            establishmentLogin[
+                                                'establishmentName']);
+                                        _login.setString(
+                                            'establishmentId',
+                                            establishmentLogin[
+                                                'establishmentId']);
+                                        _login.setString('vtestToken',
+                                            establishmentLogin['vtestToken']);
 
-                                  //       if (user != null) {
-                                  //         Provider.of<AppState>(context,
-                                  //                 listen: false)
-                                  //             .setUser(user);
-
-                                  //         _login.setString('email', user.email);
-                                  //         _login.setString(
-                                  //             'company', user.company);
-
-                                  //         setState(() => error = '');
-                                  //         setState(() => loading = false);
-
-                                  //         // Navigator.popAndPushNamed(context, '/');
-                                  //       } else {
-                                  //         setState(() => error =
-                                  //             'Invalid email or password');
-                                  //         setState(() => loading = false);
-                                  //       }
-                                  //     } else {
-                                  //       Toast.show(
-                                  //           "No Internet Connection", context,
-                                  //           duration: 5, gravity: Toast.TOP);
-                                  //     }
-                                  //   }
+                                        await Navigator.popAndPushNamed(
+                                            context, "/");
+                                        setState(() => loading = false);
+                                      } else {
+                                        setState(() {
+                                          loading = false;
+                                          error = establishmentLogin['message'];
+                                        });
+                                      }
+                                    } else {
+                                      Toast.show(
+                                          "No Internet Connection", context,
+                                          duration: 5, gravity: Toast.TOP);
+                                    }
+                                  }
                                 },
                               ),
                             ),

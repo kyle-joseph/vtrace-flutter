@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-// import 'package:FastTrace/State/appstate.dart';
-// import 'package:FastTrace/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -16,10 +13,28 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   Color homeColor;
-
   Color logsColor;
-
   Color scanColor;
+
+  bool establishmentDataExists = false;
+  SharedPreferences _establishmentData;
+
+  void initEstablishmentData() async {
+    _establishmentData = await SharedPreferences.getInstance();
+    if (_establishmentData.containsKey('establishmentName') &&
+        _establishmentData.containsKey('establishmentId') &&
+        _establishmentData.containsKey('vtestToken')) {
+      setState(() {
+        establishmentDataExists = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initEstablishmentData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +66,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     child: Text(
-                      // user.company != "none" ? user.company : "none",
-                      "John Doe",
+                      establishmentDataExists
+                          ? _establishmentData.getString('establishmentName')
+                          : "",
                       style: GoogleFonts.nunito(
                         textStyle: TextStyle(
                           color: Colors.white,
@@ -65,8 +81,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     child: Text(
-                      // user.email != "none" ? user.email : "none",
-                      "John Doe",
+                      establishmentDataExists
+                          ? _establishmentData.getString('establishmentId')
+                          : "",
                       style: GoogleFonts.nunito(
                         textStyle: TextStyle(
                           color: Colors.white,
@@ -138,11 +155,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
           InkWell(
             onTap: () async {
-              SharedPreferences _login = await SharedPreferences.getInstance();
               // Provider.of<AppState>(context, listen: false).setUser(User());
 
-              _login.remove('email');
-              _login.remove('company');
+              _establishmentData.remove('establishmentId');
+              _establishmentData.remove('establishmentName');
+              _establishmentData.remove('vtestToken');
 
               await Navigator.popAndPushNamed(context, "/");
             },
