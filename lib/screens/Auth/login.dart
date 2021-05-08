@@ -151,9 +151,9 @@ class _LoginPageState extends State<LoginPage> {
                                         _login.setString('vtestToken',
                                             establishmentLogin['vtestToken']);
 
-                                        setState(() => loading = false);
                                         await Navigator.popAndPushNamed(
                                             context, "/");
+                                        // setState(() => loading = false);
                                       } else {
                                         setState(() {
                                           loading = false;

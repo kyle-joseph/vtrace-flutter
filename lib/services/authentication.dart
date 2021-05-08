@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Authentication {
+  String _baseUrl = "http://192.168.1.12:3000/api";
+
   Future signup(
       {String email,
       String establishmentName,
@@ -9,7 +11,7 @@ class Authentication {
       String contactNumber,
       String password}) async {
     var response = await http.post(
-      'http://10.0.2.2:3000/api/establishments/create',
+      _baseUrl + '/establishments/create',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -31,7 +33,7 @@ class Authentication {
 
   Future login({String establishmentId, String password}) async {
     var response = await http.post(
-      'http://10.0.2.2:3000/api/establishments/mobile-login',
+      _baseUrl + '/establishments/mobile-login',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

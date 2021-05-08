@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
+import 'package:vtraceflutter/services/connection.dart';
+import 'package:vtraceflutter/services/logs_fetch.dart';
 
 class ScanBody extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class ScanBody extends StatefulWidget {
 }
 
 class _ScanBodyState extends State<ScanBody> {
+  EstablishmentLogs _establishmentLogs = new EstablishmentLogs();
   String _scanBarcode = 'Unknown';
   String error = '';
 
@@ -20,7 +22,6 @@ class _ScanBodyState extends State<ScanBody> {
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "Cancel", true, ScanMode.QR);
-      print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
@@ -31,38 +32,22 @@ class _ScanBodyState extends State<ScanBody> {
       _scanBarcode = barcodeScanRes;
     });
     if (_scanBarcode != '-1') {
-      List log = qrDataToList(_scanBarcode);
-      if (log.length == 8) {
-        await Navigator.pushNamed(context, '/scanned', arguments: log);
-        setState(() => error = '');
+      var userExist = await _establishmentLogs.userExist(_scanBarcode);
+
+      if (userExist['success']) {
+        var createLog = await _establishmentLogs.createLog(_scanBarcode);
+        if (createLog['success']) {
+          Toast.show('Individual log saved.', context,
+              duration: 5, gravity: Toast.BOTTOM);
+        } else {
+          setState(() => error = createLog['message']);
+          Toast.show(error, context, duration: 5, gravity: Toast.BOTTOM);
+        }
       } else {
-        setState(() => error = 'Invalid QR Code');
+        setState(() => error = userExist['message']);
         Toast.show(error, context, duration: 5, gravity: Toast.BOTTOM);
       }
     }
-  }
-
-  int countAsterisk(String log) {
-    int count = 0;
-    for (int i = 0; i < log.length; i++) {
-      if (log[i] == '*') {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  List qrDataToList(String log) {
-    print(countAsterisk(log));
-    if (countAsterisk(log) == 5) {
-      List convertLog = log.split('*');
-      DateTime datetime = DateTime.now();
-      convertLog.add(DateFormat.yMd().format(datetime));
-      convertLog.add(DateFormat.Hm().format(datetime));
-
-      return convertLog;
-    }
-    return [];
   }
 
   //See assets/images for a sample qrcode containing firsname*lastname*address*birtdate
@@ -104,7 +89,16 @@ class _ScanBodyState extends State<ScanBody> {
                 ),
                 elevation: 5,
                 color: Colors.white,
-                onPressed: () => scanQR(),
+                onPressed: () async {
+                  bool connection = await Connection().checkConnection();
+                  if (connection) {
+                    await scanQR();
+                    // await Navigator.popAndPushNamed(context, "/scan");
+                  } else {
+                    Toast.show('No internet connection.', context,
+                        duration: 5, gravity: Toast.BOTTOM);
+                  }
+                },
                 icon: Icon(
                   Icons.qr_code,
                   size: 40,
