@@ -259,10 +259,9 @@ class _SignupPageState extends State<SignupPage> {
                                       _login.setString('vtestToken',
                                           establishmentLogin['vtestToken']);
 
+                                      setState(() => loading = false);
                                       await Navigator.popAndPushNamed(
                                           context, "/");
-
-                                      setState(() => loading = false);
                                     } else {
                                       setState(() {
                                         loading = false;

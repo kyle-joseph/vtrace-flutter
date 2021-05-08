@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Authentication {
-  final String _baseUrl = "10.0.2.2:3000/api";
-
   Future signup(
       {String email,
       String establishmentName,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:vtraceflutter/services/logs_fetch.dart';
 
 class LogsBody extends StatefulWidget {
   @override
@@ -9,9 +9,9 @@ class LogsBody extends StatefulWidget {
 }
 
 class _LogsBodyState extends State<LogsBody> {
+  EstablishmentLogs _estLogs = new EstablishmentLogs();
   DateTime _fromDate = DateTime.now();
   List customerLogs = [];
-  // Logs _logs = Logs();
   bool loading = false;
 
   @override
@@ -21,19 +21,21 @@ class _LogsBodyState extends State<LogsBody> {
   }
 
   fetchLogs() async {
+    customerLogs = [];
     setState(() => loading = true);
-    // final user = Provider.of<AppState>(context, listen: false).currentUser;
-    // dynamic logs = await _logs.getLogs(numericDate, user.company);
+    var logs = await _estLogs.logsByDate(isoStringDate);
     setState(() => loading = false);
-    // setState(() => customerLogs = logs);
+    if (logs['success']) {
+      setState(() => customerLogs = logs['establishmentLogs']);
+    }
   }
 
   String get wordedDate {
     return DateFormat.yMMMd().format(_fromDate);
   }
 
-  String get numericDate {
-    return DateFormat.yMd().format(_fromDate);
+  String get isoStringDate {
+    return _fromDate.toIso8601String() + 'Z';
   }
 
   Future<void> _showDatePicker() async {
@@ -63,14 +65,12 @@ class _LogsBodyState extends State<LogsBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            rowData("Name:",
-                "${log[idx].data()['firstname']} ${log[idx].data()['lastname']}"),
-            rowData("Address:", log[idx].data()['address']),
-            rowData("Gender:", log[idx].data()['gender']),
-            rowData("Age:", log[idx].data()['age']),
-            rowData("Contact #:", log[idx].data()['contact_num']),
-            rowData("Date:", log[idx].data()['date']),
-            rowData("Time:", log[idx].data()['time']),
+            rowData(
+                "Name:", "${log[idx]['firstname']} ${log[idx]['lastname']}"),
+            rowData("Address:", log[idx]['address']),
+            rowData("Gender:", log[idx]['gender']),
+            rowData("Contact #:", log[idx]['contactNumber']),
+            rowData("Date/Time:", "${log[idx]['date']} / ${log[idx]['time']}"),
           ],
         ),
       ),
