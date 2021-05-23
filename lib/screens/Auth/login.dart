@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class LoginPage extends StatefulWidget {
-  final Function toggleView;
-  LoginPage({this.toggleView});
+  // final Function toggleView;
+  // LoginPage({this.toggleView});
 
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
@@ -188,20 +188,20 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextStyle(
                                       color: Color.fromRGBO(143, 148, 251, .8)),
                                 ),
-                                FlatButton(
-                                  textColor: Colors.blue,
-                                  child: Text(
-                                    'Signup',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Color.fromRGBO(143, 148, 251, .8),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    //signup screen
-                                    widget.toggleView();
-                                  },
-                                )
+                                // FlatButton(
+                                //   textColor: Colors.blue,
+                                //   child: Text(
+                                //     'Signup',
+                                //     style: TextStyle(
+                                //       fontSize: 18,
+                                //       color: Color.fromRGBO(143, 148, 251, .8),
+                                //     ),
+                                //   ),
+                                //   onPressed: () {
+                                //     //signup screen
+                                //     widget.toggleView();
+                                //   },
+                                // )
                               ],
                               mainAxisAlignment: MainAxisAlignment.center,
                             ))

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Authentication {
-  String _baseUrl = "http://192.168.1.12:3000/api";
+  String _baseUrl = "https://vtrace-backend.herokuapp.com/api";
 
   Future signup(
       {String email,

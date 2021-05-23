@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class EstablishmentLogs {
   SharedPreferences _establishmentData;
-  String _baseUrl = "http://192.168.1.12:3000/api";
+  String _baseUrl = "https://vtrace-backend.herokuapp.com/api";
 
   Future logsByDate(String dateTime) async {
     _establishmentData = await SharedPreferences.getInstance();
